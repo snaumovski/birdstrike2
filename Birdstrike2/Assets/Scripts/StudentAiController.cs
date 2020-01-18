@@ -9,22 +9,29 @@ public class StudentAiController : MonoBehaviour
         public GameObject goal;
         public int RandomEventInt;
         public bool idle;
-        private Vector3 Destination;
+        public bool inClass;
     private void Start()
         
         {
+            //Grabs agent navmesh component
             agent = this.GetComponent<NavMeshAgent>();
+            // sets destination on start
         agent.SetDestination(goal.transform.position);
+		/*
+         * agent.SetDestination(goal.transform.position);
+         * 
+         */
+        
+	}
 
-    }
 
 
-
-        // Update is called once per frame
-        void Update()
+	// Update is called once per frame
+	void Update()
         {
         if (idle == false)
         {
+            //If not standing still r
             RandomEventInt = Random.Range(0, 10000);
             agent.isStopped = false;
         }
@@ -51,7 +58,19 @@ public class StudentAiController : MonoBehaviour
                 break;
 
         }
+        var Destination = agent.pathEndPosition;
+        var Currentpos = agent.gameObject.transform.position;
+        //
+        float DistanceFromTarget = Vector3.Distance(Destination, Currentpos);
+
+        if  (DistanceFromTarget < 1){
+
+            inClass = true;
+            StartCoroutine(IdleTime(25));
         }
+
+ }
+
 
 
     IEnumerator IdleTime(float TimeToBeIdle)
