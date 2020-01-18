@@ -3,6 +3,7 @@
   <component name="ContentModelUserStore">
     <attachedFolders />
     <explicitIncludes>
+      <Path>Library/PackageCache/com.ptc.vuforia.engine@8.5.9</Path>
       <Path>Library/PackageCache/com.unity.burst@1.2.0</Path>
       <Path>Library/PackageCache/com.unity.collections@0.1.1-preview</Path>
       <Path>Library/PackageCache/com.unity.entities@0.1.1-preview</Path>
@@ -22,6 +23,7 @@
       <Path>.idea</Path>
       <Path>Library</Path>
       <Path>Logs</Path>
+      <Path>QCAR</Path>
       <Path>Temp</Path>
       <Path>builds</Path>
       <Path>obj</Path>

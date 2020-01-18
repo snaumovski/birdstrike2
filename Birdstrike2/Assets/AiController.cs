@@ -3,6 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public class Personas {
+
+    // store var of each child 
+    
+    
+
+}
+
+
+
+
 public class AiController : MonoBehaviour
 {
 
