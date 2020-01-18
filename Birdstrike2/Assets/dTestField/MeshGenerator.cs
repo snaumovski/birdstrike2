@@ -1,11 +1,18 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Mathematics;
+﻿using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.AI;
+using Object = UnityEngine.Object;
 
 public static class PathHelper {
+
+    public enum Parts {
+
+        Wall,
+        Floor,
+        Furniture,
+        Poi
+
+    }
+    private static string[ ] _values = {"walls", "floors", "furniture"};
 
     public static Vector3 Quantize( Vector3 v, Vector3 q ) {
         float x = q.x * Mathf.Floor( v.x / q.x );
@@ -24,9 +31,27 @@ public static class PathHelper {
     public static Bounds QauntizeBounds( Vector3 center, Vector3 size, float factor ) {
         return new Bounds( Quantize( center, factor * size ), size );
     }
-    
-    
-    
+
+    public static GameObject ImportRoom( this GameObject room ) {
+        GameObject output = Object.Instantiate( room );
+
+        // search through first anchor 
+        foreach ( Transform c1 in output.transform ) {
+            // search through each  layer
+            foreach ( Transform c2 in c1 ) {
+                // search through each object in that layer 
+                foreach ( Transform c3 in c2 ) {
+                    foreach ( var v in _values ) {
+                        // assign tag 
+                        if ( !c3.name.ToLower( ).Contains( v.ToLower( ) ) ) continue;
+
+                        c3.gameObject.tag = v;
+                    }
+                }
+            }
+        }
+        return output;
+    }
 
 }
 public class MeshGenerator : MonoBehaviour {
@@ -42,10 +67,6 @@ public class MeshGenerator : MonoBehaviour {
     private float3 _end;
     private GameObject _mesh;
     private float3[ ] _vertices;
-    private NavMeshData _navMeshData;
-    private AsyncOperation _operation;
-    private NavMeshDataInstance _navInstance;
-    private List<NavMeshBuildSource> _navSources = new List<NavMeshBuildSource>( );
 
     void Start( ) {
         // build mesh object 
