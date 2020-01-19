@@ -1,18 +1,11 @@
-﻿using Unity.Mathematics;
+﻿using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.AI;
 using Object = UnityEngine.Object;
 
 public static class PathHelper {
 
-    public enum Parts {
-
-        Wall,
-        Floor,
-        Furniture,
-        Poi
-
-    }
-    private static string[ ] _values = {"walls", "floors", "furniture"};
 
     public static Vector3 Quantize( Vector3 v, Vector3 q ) {
         float x = q.x * Mathf.Floor( v.x / q.x );
@@ -32,26 +25,26 @@ public static class PathHelper {
         return new Bounds( Quantize( center, factor * size ), size );
     }
 
-    public static GameObject ImportRoom( this GameObject room ) {
-        GameObject output = Object.Instantiate( room );
+    public static void Collect( ref List<NavMeshBuildSource> sources, List<MeshFilter> meshes ) {
+        sources.Clear( );
 
-        // search through first anchor 
-        foreach ( Transform c1 in output.transform ) {
-            // search through each  layer
-            foreach ( Transform c2 in c1 ) {
-                // search through each object in that layer 
-                foreach ( Transform c3 in c2 ) {
-                    foreach ( var v in _values ) {
-                        // assign tag 
-                        if ( !c3.name.ToLower( ).Contains( v.ToLower( ) ) ) continue;
+        for ( var i = 0; i < meshes.Count; ++i ) {
+            var mf = meshes[ i ];
+            if ( mf == null ) continue;
 
-                        c3.gameObject.tag = v;
-                    }
-                }
-            }
+            var m = mf.sharedMesh;
+            if ( m == null ) continue;
+
+            var s = new NavMeshBuildSource {
+                shape = NavMeshBuildSourceShape.Mesh,
+                sourceObject = m,
+                transform = mf.transform.localToWorldMatrix,
+                area = 0
+            };
+            sources.Add( s );
         }
-        return output;
     }
+
 
 }
 public class MeshGenerator : MonoBehaviour {

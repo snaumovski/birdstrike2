@@ -16,6 +16,7 @@
       <Path>Library/PackageCache/com.unity.properties@0.6.2-preview</Path>
       <Path>Library/PackageCache/com.unity.test-framework@1.1.1</Path>
       <Path>Library/PackageCache/com.unity.textmeshpro@2.0.1</Path>
+      <Path>Library/PackageCache/com.unity.xr.windowsmr.metro@3.0.6</Path>
       <Path>Library/PackageCache/nuget.mono-cecil@0.1.6-preview</Path>
       <Path>Packages</Path>
       <Path>ProjectSettings</Path>
@@ -25,7 +26,6 @@
       <Path>Library</Path>
       <Path>Logs</Path>
       <Path>QCAR</Path>
-      <Path>Temp</Path>
       <Path>builds</Path>
       <Path>obj</Path>
     </explicitExcludes>

@@ -10,8 +10,8 @@
         <e p="dTestField" t="Include">
           <e p="AgentManager.cs" t="Include" />
           <e p="MeshGenerator.cs" t="Include" />
-          <e p="NavMeshManager.cs" t="Include" />
-          <e p="Room.cs" t="Include" />
+          <e p="NavMeshSourceTag.cs" t="Include" />
+          <e p="NavMeshWatcher.cs" t="Include" />
           <e p="RoomManager.cs" t="Include" />
         </e>
         <e p="MixedRealityToolkit" t="Include">
@@ -1337,6 +1337,9 @@
           <e p="Version.txt" t="Include" />
         </e>
         <e p="myScripts" t="Include">
+          <e p="FlockHandler.cs" t="Include" />
+          <e p="InputHandler.cs" t="Include" />
+          <e p="Room.cs" t="Include" />
           <e p="RoomImporter.cs" t="Include" />
         </e>
         <e p="StreamingAssets" t="Include">

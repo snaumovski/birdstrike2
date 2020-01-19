@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace myScript {
-    [ExecuteInEditMode]
+    // [ExecuteInEditMode]
     public class RoomImporter : MonoBehaviour {
 
         public bool run = false;
@@ -13,7 +13,7 @@ namespace myScript {
         private void Update( ) {
             if ( run && rooms.Count > 0 ) {
                 foreach ( var r in rooms ) {
-                    _stored.Add( r.ImportRoom( ) );
+                    // _stored.Add( r.ImportRoom( ) );
                 }
                 rooms.Clear( );
 
