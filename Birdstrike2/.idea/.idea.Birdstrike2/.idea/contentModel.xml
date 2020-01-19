@@ -1337,6 +1337,7 @@
           <e p="Version.txt" t="Include" />
         </e>
         <e p="myScripts" t="Include">
+          <e p="CameraPosition.cs" t="Include" />
           <e p="FlockHandler.cs" t="Include" />
           <e p="InputHandler.cs" t="Include" />
           <e p="Room.cs" t="Include" />

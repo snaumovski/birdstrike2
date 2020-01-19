@@ -1,99 +1,139 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+using System;
+using dTestField;
 using UnityEngine;
 using Vuforia;
 
-public class RoomTracker : MonoBehaviour, ITrackableEventHandler {
+namespace myScript {
+    public class RoomTracker : MonoBehaviour, ITrackableEventHandler {
 
-    #region PROTECTED_MEMBER_VARIABLES
+        public GameObject room;
+        public Vector3 Pos { get; private set; }
+        private GameObject _blueGoal;
+        private GameObject _redGoal;
+        public Vector3 blueStart { get; private set; }
+        public Vector3 redStart { get; private set; }
+        public Vector3 blueEnd { get; private set; }
+        public Vector3 redEnd { get; private set; }
+        private GameObject _instance;
+        private bool _vuforiaCreated;
+        private TrackableBehaviour _behaviour;
+        private TrackableBehaviour.Status _previousStatus;
+        private TrackableBehaviour.Status _newStatus;
 
-    protected TrackableBehaviour mTrackableBehaviour;
-    protected TrackableBehaviour.Status m_PreviousStatus;
-    protected TrackableBehaviour.Status m_NewStatus;
-
-    #endregion // PROTECTED_MEMBER_VARIABLES
-    #region UNITY_MONOBEHAVIOUR_METHODS
-
-    protected virtual void Start( ) {
-        mTrackableBehaviour = GetComponent<TrackableBehaviour>( );
-
-        if ( mTrackableBehaviour ) {
-            mTrackableBehaviour.RegisterTrackableEventHandler( this );
+        private void Awake( ) {
+            if ( _blueGoal == null || _redGoal == null ) {
+                SetGoals( );
+            } else {
+                redStart = _blueGoal.transform.position;
+                blueStart = _redGoal.transform.position;
+                redEnd = blueStart;
+                blueEnd = redStart;
+            }
+            
         }
-    }
 
-    protected virtual void OnDestroy( ) {
-        if ( mTrackableBehaviour )
-            mTrackableBehaviour.UnregisterTrackableEventHandler( this );
-    }
-
-    #endregion // UNITY_MONOBEHAVIOUR_METHODS
-    #region PUBLIC_METHODS
-
-    /// <summary>
-    ///     Implementation of the ITrackableEventHandler function called when the
-    ///     tracking state changes.
-    /// </summary>
-    public void OnTrackableStateChanged( TrackableBehaviour.Status previousStatus, TrackableBehaviour.Status newStatus ) {
-        m_PreviousStatus = previousStatus;
-        m_NewStatus = newStatus;
-        Debug.Log( "Trackable " + mTrackableBehaviour.TrackableName + " " + mTrackableBehaviour.CurrentStatus + " -- " + mTrackableBehaviour.CurrentStatusInfo );
-
-        if ( newStatus == TrackableBehaviour.Status.DETECTED || newStatus == TrackableBehaviour.Status.TRACKED || newStatus == TrackableBehaviour.Status.EXTENDED_TRACKED ) {
-            OnTrackingFound( );
-        } else if ( previousStatus == TrackableBehaviour.Status.TRACKED && newStatus == TrackableBehaviour.Status.NO_POSE ) {
-            OnTrackingLost( );
-        } else {
-            // For combo of previousStatus=UNKNOWN + newStatus=UNKNOWN|NOT_FOUND
-            // Vuforia is starting, but tracking has not been lost or found yet
-            // Call OnTrackingLost() to hide the augmentations
-            OnTrackingLost( );
+        private void SetGoals( ) {
+            
+            foreach ( Transform c1 in transform ) {
+                if ( c1.CompareTag( "BlueGoal" ) ) {
+                    _blueGoal = c1.gameObject;
+                } else if ( c1.CompareTag( "RedGoal" ) ) {
+                    _redGoal = c1.gameObject;
+                }
+            }
         }
-    }
 
-    #endregion // PUBLIC_METHODS
-    #region PROTECTED_METHODS
+        private void Update( ) {
+            if ( _blueGoal == null || _redGoal == null ) {
+                SetGoals( );
+            }
+            redStart = _blueGoal.transform.position;
+            blueStart = _redGoal.transform.position;
+            redEnd = blueStart;
+            blueEnd = redStart;
 
-    protected virtual void OnTrackingFound( ) {
-        if ( mTrackableBehaviour ) {
-            var rendererComponents = mTrackableBehaviour.GetComponentsInChildren<Renderer>( true );
-            var colliderComponents = mTrackableBehaviour.GetComponentsInChildren<Collider>( true );
-            var canvasComponents = mTrackableBehaviour.GetComponentsInChildren<Canvas>( true );
+            if ( !_vuforiaCreated ) {
+                CheckCreation( );
+            } else {
 
-            // Enable rendering:
-            foreach ( var component in rendererComponents )
-                component.enabled = true;
 
-            // Enable colliders:
-            foreach ( var component in colliderComponents )
-                component.enabled = true;
+                if ( _newStatus == TrackableBehaviour.Status.TRACKED ) {
+                         
+                    if ( _instance == null ) {
+                        _instance = Instantiate( room, transform );
+                        _instance.transform.position = transform.position;
 
-            // Enable canvas':
-            foreach ( var component in canvasComponents )
-                component.enabled = true;
+                    }
+            
+            
+                    if ( !RoomManager.Instance.Trackers.Contains( this ) ) {
+                        RoomManager.Instance.Trackers.Add( this );
+                    }
+                }
+            }
         }
-    }
 
-    protected virtual void OnTrackingLost( ) {
-        if ( mTrackableBehaviour ) {
-            var rendererComponents = mTrackableBehaviour.GetComponentsInChildren<Renderer>( true );
-            var colliderComponents = mTrackableBehaviour.GetComponentsInChildren<Collider>( true );
-            var canvasComponents = mTrackableBehaviour.GetComponentsInChildren<Canvas>( true );
+        protected virtual void CheckCreation( ) {
+            if ( !VuforiaManager.Instance.Initialized ) return;
 
-            // Disable rendering:
-            foreach ( var component in rendererComponents )
-                component.enabled = false;
-
-            // Disable colliders:
-            foreach ( var component in colliderComponents )
-                component.enabled = false;
-
-            // Disable canvas':
-            foreach ( var component in canvasComponents )
-                component.enabled = false;
+            SetupTrackableBehavior( );
+            _vuforiaCreated = true;
         }
+
+        protected virtual void ToggleObjects( bool status ) {
+            foreach ( Transform t in transform ) {
+                t.gameObject.SetActive( status );
+            }
+        }
+
+        protected virtual void OnTrackingFound( ) {
+            Debug.Log( "trackingFound" );
+       
+            ToggleObjects( true );
+        }
+
+        protected virtual void OnExtendedTracking( ) { }
+
+        protected virtual void OnLimitedTracking( ) {
+            if ( RoomManager.Instance.Trackers.Contains( this ) ) {
+                RoomManager.Instance.Trackers.Remove( this );
+            }
+            ToggleObjects( false );
+        }
+
+        protected virtual void OnTrackingLost( ) {
+            if ( RoomManager.Instance.Trackers.Contains( this ) ) {
+                RoomManager.Instance.Trackers.Remove( this );
+            }
+            ToggleObjects( false );
+        }
+
+        private void SetupTrackableBehavior( ) {
+            _behaviour = GetComponent<TrackableBehaviour>( );
+
+            if ( _behaviour ) {
+                _behaviour.RegisterTrackableEventHandler( this );
+            }
+            _vuforiaCreated = true;
+        }
+
+        public void OnTrackableStateChanged( TrackableBehaviour.Status previousStatus, TrackableBehaviour.Status newStatus ) {
+            _previousStatus = previousStatus;
+            _newStatus = newStatus;
+
+            if ( _newStatus == TrackableBehaviour.Status.DETECTED )
+                OnTrackingFound( );
+            else if ( _newStatus == TrackableBehaviour.Status.TRACKED )
+                OnTrackingFound( );
+            else if ( _newStatus == TrackableBehaviour.Status.EXTENDED_TRACKED )
+                OnExtendedTracking( );
+            else if ( _newStatus == TrackableBehaviour.Status.LIMITED )
+                OnLimitedTracking( );
+            else if ( _previousStatus == TrackableBehaviour.Status.TRACKED && _newStatus == TrackableBehaviour.Status.NO_POSE )
+                OnTrackingLost( );
+            else
+                OnTrackingLost( );
+        }
+
     }
-
-    #endregion // PROTECTED_METHODS
-
 }

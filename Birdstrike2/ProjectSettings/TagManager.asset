@@ -9,6 +9,8 @@ TagManager:
   - poi
   - furniture
   - agent
+  - BlueGoal
+  - RedGoal
   layers:
   - Default
   - TransparentFX

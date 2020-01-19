@@ -1,26 +1,28 @@
 ﻿using System.Collections.Generic;
 using dTestField;
+using myScript;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 using Vuforia;
+using Random = UnityEngine.Random;
 
 public class FlockHandler : MonoBehaviour {
 
     public static FlockHandler Instance { get; set; }
+    public bool ActiveTarget { private get; set; }
+    public Vector3 SpawnPoint { private get; set; }
+    public List<Vector3> RedGoals { private get; set; }
+    public List<Vector3> BlueGoals { private get; set; }
+    public GameObject RedSpawn { private get; set; }
+    public GameObject BlueSpawn { private get; set; }
     public bool createScene = false;
     public bool runSim = false;
     public int agentCount;
-    public VuforiaMonoBehaviour tempTracker;
     public GameObject spawnScene;
-    public GameObject spawnLocation;
     public Vector2 ratio = new Vector2( 1, 2 );
     public GameObject blueObj;
     public GameObject redObj;
-    public GameObject blueStart;
-    public GameObject redStart;
-    public GameObject blueEnd;
-    public GameObject redEnd;
     private List<GameObject> _redAgents;
     private List<GameObject> _blueAgents;
     private NavMeshAgent _redAgent;
@@ -28,34 +30,66 @@ public class FlockHandler : MonoBehaviour {
     private GameObject _blueContainer;
     private GameObject _redContainer;
     private GameObject _tempRoom;
-    private Vector3 _startPos;
 
     private void Awake( ) {
+        BlueSpawn = new GameObject( "Blue Spawner" );
+        RedSpawn = new GameObject( "Red Spawner" );
         Instance = this;
+        _redAgent = redObj.GetComponent<NavMeshAgent>( );
+        _blueAgent = blueObj.GetComponent<NavMeshAgent>( );
     }
 
     private void Update( ) {
-        if ( createScene ) {
-            _tempRoom = SetUpScene( spawnLocation, spawnScene );
-            createScene = false;
-        }
-        if ( _tempRoom == null ) return;
-        if ( !runSim ) return;
+        Debug.Log( "Camera pos is " + CameraPosition.Instance.Pos );
 
-        if ( NavMeshWatcher.Instance.NavMeshReady ) {
-            if ( _blueAgents != null && _redAgents.Count != null ) {
+        if ( !ActiveTarget ) {
+            Debug.Log( "target is not active" );
+            runSim = false;
+            createScene = false;
+            return;
+        }
+
+        //build the scene nw that target is tracking
+        if ( ActiveTarget && !createScene ) {
+            Debug.Log( "spawning scene " );
+            _tempRoom = SetUpScene( SpawnPoint, spawnScene );
+            createScene = true;
+        }
+
+        if ( ActiveTarget && createScene && !runSim && NavMeshWatcher.Instance.NavMeshReady ) {
+            Debug.Log( "start sim" );
+
+            if ( _blueAgents != null ) {
                 DestroyAgents( );
             }
-            _redAgent = redObj.GetComponent<NavMeshAgent>( );
-            _blueAgent = blueObj.GetComponent<NavMeshAgent>( );
             SetUpAgents( );
-            runSim = false;
+            runSim = true;
         }
+
+        // if ( !runSim ) return;
+        //
+        // if ( NavMeshWatcher.Instance.NavMeshReady ) {
+        //     
+        //     
+        //     if ( _blueAgents != null ) {
+        //         DestroyAgents( );
+        //     }
+        //
+        //     // SetUpAgents( );
+        //     runSim = false;
+        // }
     }
 
-    private GameObject SetUpScene( GameObject loc, GameObject room ) {
+    public void SpawnSceneSetup( RoomTracker targetAnchor ) {
+        var trackerRoom = Instantiate( spawnScene );
+        trackerRoom.transform.position = targetAnchor.transform.position;
+        BlueSpawn.transform.position = targetAnchor.blueStart;
+        RedSpawn.transform.position = targetAnchor.blueStart;
+    }
+
+    private GameObject SetUpScene( Vector3 loc, GameObject room ) {
         var scene = Instantiate( room );
-        scene.transform.position = loc.transform.position;
+        scene.transform.position = loc;
         scene.name = "Scene Room";
         return scene;
     }
@@ -70,20 +104,20 @@ public class FlockHandler : MonoBehaviour {
         int redAmount = (int) math.floor( agentCount / ratio.y );
 
         // build list of agents 
-        _blueAgents = BuildAgents( blueObj, _blueContainer, blueStart, blueAmount, _blueAgent );
-        _redAgents = BuildAgents( redObj, _redContainer, redStart, redAmount, _redAgent );
+        _blueAgents = BuildAgents( blueObj, _blueContainer, BlueSpawn, blueAmount, _blueAgent );
+        _redAgents = BuildAgents( redObj, _redContainer, RedSpawn, redAmount, _redAgent );
 
         // update agent list 
-        SetAgentList( _blueAgents, blueEnd );
-        SetAgentList( _redAgents, redEnd );
+        SetAgentList( _blueAgents, BlueGoals );
+        SetAgentList( _redAgents, RedGoals );
     }
 
-    private static void SetAgentList( List<GameObject> agents, GameObject point ) {
+    private static void SetAgentList( List<GameObject> agents, List<Vector3> goals ) {
         foreach ( var agent in agents ) {
             var data = agent.GetComponent<NavMeshAgent>( );
 
             if ( data != null ) {
-                data.SetDestination( point.transform.position );
+                data.SetDestination( goals[ 0 ] );
             }
         }
     }

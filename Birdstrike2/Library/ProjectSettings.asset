@@ -84,7 +84,7 @@ PlayerSettings:
   resizableWindow: 0
   useMacAppStoreValidation: 0
   macAppStoreCategory: public.app-category.games
-  gpuSkinning: 1
+  gpuSkinning: 0
   graphicsJobs: 0
   xboxPIXTextureCapture: 0
   xboxEnableAvatar: 0
@@ -666,11 +666,11 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: Template3D
   metroPackageVersion: 1.0.0.0
-  metroCertificatePath: 
+  metroCertificatePath: Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: tbd
+  metroCertificateIssuer: tbd
+  metroCertificateNotAfter: 8036fe60d8edd601
   metroApplicationDescription: Template_3D
   wsaImages: {}
   metroTileShortName: 
@@ -729,7 +729,7 @@ PlayerSettings:
     Desktop: False
     Holographic: True
     IoT: False
-    IoTHeadless: True
+    IoTHeadless: False
     Mobile: False
     Team: False
     Xbox: False
@@ -794,4 +794,4 @@ PlayerSettings:
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0
-  legacyClampBlendShapeWeights: 0
+  legacyClampBlendShapeWeights: 1

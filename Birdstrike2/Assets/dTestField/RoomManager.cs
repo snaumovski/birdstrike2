@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using myScript;
 using UnityEngine;
 
 namespace dTestField {
@@ -38,8 +39,34 @@ namespace dTestField {
     }
     public class RoomManager : MonoBehaviour {
 
-        private List<GameObject> _storedRooms = new List<GameObject>( );
-        private void Start( ) { }
+        public List<RoomTracker> Trackers { get; set; }
+        public static RoomManager Instance;
+
+        private void Awake( ) {
+            Instance = this;
+            Trackers = new List<RoomTracker>();
+        }
+        
+        
+
+        private bool _set = false;
+
+        public void Update( ) {
+       
+            if ( Trackers.Count > 0 ) {
+                if ( !_set ) {
+                    var targetAnchor = Trackers[ 0 ];
+                    FlockHandler.Instance.SpawnPoint = targetAnchor.Pos;
+                    FlockHandler.Instance.SpawnSceneSetup( targetAnchor );
+                    _set = true;
+                }
+            }
+
+            if ( Trackers.Count == 0 ) {
+                _set = false;
+            }
+            FlockHandler.Instance.ActiveTarget = Trackers.Count > 0;
+        }
 
     }
 }

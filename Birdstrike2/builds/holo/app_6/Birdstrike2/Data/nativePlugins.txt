@@ -1,0 +1,4 @@
+lib_burst_generated.dll
+VuforiaWrapper.dll
+AudioPluginMsHRTF.dll
+Vuforia.dll
