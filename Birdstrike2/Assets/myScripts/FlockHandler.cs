@@ -1,27 +1,19 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using dTestField;
-using Microsoft.MixedReality.Toolkit.Utilities.Solvers;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
+using Vuforia;
 
 public class FlockHandler : MonoBehaviour {
 
-    
-    
-    
-    
     public static FlockHandler Instance { get; set; }
-    
     public bool createScene = false;
     public bool runSim = false;
-    
-    
-    
     public int agentCount;
+    public VuforiaMonoBehaviour tempTracker;
     public GameObject spawnScene;
+    public GameObject spawnLocation;
     public Vector2 ratio = new Vector2( 1, 2 );
     public GameObject blueObj;
     public GameObject redObj;
@@ -35,49 +27,40 @@ public class FlockHandler : MonoBehaviour {
     private NavMeshAgent _blueAgent;
     private GameObject _blueContainer;
     private GameObject _redContainer;
-
-
     private GameObject _tempRoom;
-    
     private Vector3 _startPos;
 
-    
     private void Awake( ) {
         Instance = this;
     }
 
     private void Update( ) {
-
         if ( createScene ) {
-            SetUpScene( spawnScene.transform.position );
-            
+            _tempRoom = SetUpScene( spawnLocation, spawnScene );
+            createScene = false;
         }
-        
-        if(_tempRoom == null) return;
-        
+        if ( _tempRoom == null ) return;
         if ( !runSim ) return;
 
-        
-        
         if ( NavMeshWatcher.Instance.NavMeshReady ) {
-            if ( _blueAgents!= null && _redAgents.Count != null ) {
-                DestroyAgents(  );
+            if ( _blueAgents != null && _redAgents.Count != null ) {
+                DestroyAgents( );
             }
-            
             _redAgent = redObj.GetComponent<NavMeshAgent>( );
             _blueAgent = blueObj.GetComponent<NavMeshAgent>( );
-            SetUpAgents(  );
+            SetUpAgents( );
             runSim = false;
         }
     }
 
-    private void SetUpScene( Vector3 pos ) {
-
-        var scene = Instantiate( spawnScene );
+    private GameObject SetUpScene( GameObject loc, GameObject room ) {
+        var scene = Instantiate( room );
+        scene.transform.position = loc.transform.position;
         scene.name = "Scene Room";
+        return scene;
     }
 
-    private void SetUpAgents(  ) {
+    private void SetUpAgents( ) {
         // create containers 
         _blueContainer = new GameObject( "blue container" );
         _redContainer = new GameObject( "red container" );
@@ -109,7 +92,7 @@ public class FlockHandler : MonoBehaviour {
         List<GameObject> temp = new List<GameObject>( );
 
         for ( int i = 0; i < amount; i++ ) {
-            var instance = Instantiate( obj, container.transform );
+            var instance = Instantiate( obj );
             instance.name = obj.name + " " + i;
             instance.transform.position = start.transform.position;
 

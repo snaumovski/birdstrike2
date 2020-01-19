@@ -30,8 +30,11 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
     protected virtual void Start()
     {
         mTrackableBehaviour = GetComponent<TrackableBehaviour>();
-        if (mTrackableBehaviour)
+
+        if ( mTrackableBehaviour ) {
             mTrackableBehaviour.RegisterTrackableEventHandler(this);
+            
+        }
     }
 
     protected virtual void OnDestroy()
@@ -103,6 +106,8 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
             foreach (var component in canvasComponents)
                 component.enabled = true;
         }
+        
+        
     }
 
 

@@ -1341,6 +1341,7 @@
           <e p="InputHandler.cs" t="Include" />
           <e p="Room.cs" t="Include" />
           <e p="RoomImporter.cs" t="Include" />
+          <e p="RoomTracker.cs" t="Include" />
         </e>
         <e p="StreamingAssets" t="Include">
           <e p="Vuforia" t="Include">
