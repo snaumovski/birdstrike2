@@ -9,9 +9,19 @@ using UnityEngine.AI;
 
 public class FlockHandler : MonoBehaviour {
 
+    
+    
+    
+    
     public static FlockHandler Instance { get; set; }
+    
+    public bool createScene = false;
     public bool runSim = false;
+    
+    
+    
     public int agentCount;
+    public GameObject spawnScene;
     public Vector2 ratio = new Vector2( 1, 2 );
     public GameObject blueObj;
     public GameObject redObj;
@@ -25,13 +35,26 @@ public class FlockHandler : MonoBehaviour {
     private NavMeshAgent _blueAgent;
     private GameObject _blueContainer;
     private GameObject _redContainer;
+
+
+    private GameObject _tempRoom;
+    
     private Vector3 _startPos;
 
+    
     private void Awake( ) {
         Instance = this;
     }
 
     private void Update( ) {
+
+        if ( createScene ) {
+            SetUpScene( spawnScene.transform.position );
+            
+        }
+        
+        if(_tempRoom == null) return;
+        
         if ( !runSim ) return;
 
         
@@ -43,12 +66,18 @@ public class FlockHandler : MonoBehaviour {
             
             _redAgent = redObj.GetComponent<NavMeshAgent>( );
             _blueAgent = blueObj.GetComponent<NavMeshAgent>( );
-            SetUpScene( transform.position );
+            SetUpAgents(  );
             runSim = false;
         }
     }
 
     private void SetUpScene( Vector3 pos ) {
+
+        var scene = Instantiate( spawnScene );
+        scene.name = "Scene Room";
+    }
+
+    private void SetUpAgents(  ) {
         // create containers 
         _blueContainer = new GameObject( "blue container" );
         _redContainer = new GameObject( "red container" );
