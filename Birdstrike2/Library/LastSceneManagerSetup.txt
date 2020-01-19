@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/SNspecial/Classroom 1 Vuforia.unity
+- path: Assets/myScenes/Classroom 1 Vuforia.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0
